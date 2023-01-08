@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Alibaba_Scout/.local-chromium/Win64-970485/chrome-win
+/Alibaba_Scout/bin/Debug/net6.0
+/Alibaba_Scout/obj
+/Scout/bin/Debug/net6.0
+/Scout/obj
+/Terminal/bin/Debug/net6.0
+/Terminal/obj/Debug/net6.0/ref/Terminal.dll
+/Terminal/obj
