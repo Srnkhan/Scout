@@ -18,6 +18,7 @@ namespace Company.Consumers
     using Alibaba_Scout.Modals.Categories;
     using System.Linq;
     using Alibaba_Scout.Contracts;
+    using System;
 
     public class ZeroLayerScoutConsumerConsumer :
         IConsumer<ZeroLayerScoutConsumer>
@@ -42,6 +43,7 @@ namespace Company.Consumers
         {
             try
             {
+                Logger.LogInformation($"Zero Layer Started At : {DateTime.UtcNow.ToString()}");
                 await CreatePage();
 
                 var urlListResponse = await new ScoutCommand(CommandType.JsQuery,
@@ -54,15 +56,19 @@ namespace Company.Consumers
                                                         .ExecuteAsync();
                 var urlList = JsonConvert.DeserializeObject<List<string>>(urlListResponse.ResultObject.ToString());
                 var nameList = JsonConvert.DeserializeObject<List<string>>(nameListResponse.ResultObject.ToString());
+                await CurrentPage.Browser.CloseAsync();
+
                 int index = 0;
                 var categories = urlList.Select(url =>
                 {
-                    string name = nameList[index++];
+                    string name = nameList[index].ToString();
+                    ++index;
                     return new Category(name , url);
-                });
-                await CategoryRepository.InsertAsync(categories);
-                await UnitOfWork.SaveChangesAsync();
-                await CurrentPage.Browser.CloseAsync();
+                }).ToList();
+                index = 0;
+                await CreateOrUpdateAsync(categories);
+
+                Logger.LogInformation($"Zero Layer Done At : {DateTime.UtcNow.ToString()}");
                 await context.RespondAsync<OperationResult>(OperationResult.SuccessResult("Successfully done"));
             }
             catch (System.Exception ex)
@@ -75,13 +81,37 @@ namespace Company.Consumers
         {
             this.CurrentPage = await ScoutBuilderDirector
                                 .NewPage
-                                .Header(false)
+                                .Header(true)
                                 .With(1920)
                                 .Height(1080)
                                 .Url("https://www.aliexpress.us/")
                                 .Browser("970485")
                                 .PrepareAsync();
         }
+        private async Task CreateOrUpdateAsync(IEnumerable<Category> categories )
+        {
 
+            var allCategories = (await CategoryRepository.GetAllAsync()).ToList();
+            var newCategories = categories.Where(category => !allCategories.Select(x => x.Name).Contains(category.Name)).ToList();
+            var oldCategories = allCategories.Where(category => !categories.Select(x => x.Name).Contains(category.Name)).ToList();
+            Logger.LogInformation($"Zero Layer At : {DateTime.UtcNow.ToString()} New Categories : {JsonConvert.SerializeObject(newCategories)}");
+            Logger.LogInformation($"Zero Layer At : {DateTime.UtcNow.ToString()} Old Categories : {JsonConvert.SerializeObject(oldCategories)}");
+
+            if (newCategories.Any())            
+                await CategoryRepository.InsertAsync(newCategories); 
+            
+            if (oldCategories.Any())
+            {
+                foreach(var category in oldCategories)
+                {
+                    CategoryRepository.Delete(category);
+                }
+            }
+
+            if (newCategories.Any() || oldCategories.Any())
+                await UnitOfWork.SaveChangesAsync();
+
+
+        }
     }
 }

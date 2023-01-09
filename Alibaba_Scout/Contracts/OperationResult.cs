@@ -8,8 +8,8 @@ namespace Alibaba_Scout.Contracts
 {
     internal class OperationResult
     {
-        public string Result { get; private set; }
-        public bool IsSuccess { get; private set; }
+        public string Result { get; set; }
+        public bool IsSuccess { get;  set; }
 
         private static OperationResult _instance;
 

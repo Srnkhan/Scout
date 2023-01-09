@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
+using Alibaba_Scout.Modals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -141,6 +142,7 @@ namespace Arch.EntityFrameworkCore.UnitOfWork
         /// <returns>A <see cref="Task{TResult}"/> that represents the asynchronous save operation. The task result contains the number of state entities written to database.</returns>
         public async Task<int> SaveChangesAsync(bool ensureAutoHistory = false)
         {
+            HandleAdded();
             if (ensureAutoHistory)
             {
                 _context.EnsureAutoHistory();
@@ -210,6 +212,21 @@ namespace Arch.EntityFrameworkCore.UnitOfWork
         public void TrackGraph(object rootEntity, Action<EntityEntryGraphNode> callback)
         {
             _context.ChangeTracker.TrackGraph(rootEntity, callback);
+        }
+        //TODO
+        private void HandleAdded()
+        {
+            var added = _context.ChangeTracker.Entries<Base>().Where(e => e.State == EntityState.Added);
+            var updated = _context.ChangeTracker.Entries<Base>().Where(e => e.State == EntityState.Modified);
+
+            foreach (var entry in added)
+            {
+                entry.Property(x => x.CreateTime).CurrentValue = DateTime.UtcNow;              
+            }
+            foreach (var entry in updated)
+            {
+                entry.Property(x => x.UpdateTime).CurrentValue = DateTime.UtcNow;
+            }
         }
     }
 }
