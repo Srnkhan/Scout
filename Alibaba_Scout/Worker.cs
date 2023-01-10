@@ -31,9 +31,15 @@ namespace Alibaba_Scout
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var response = await _client.GetResponse<OperationResult>(new ZeroLayerScoutConsumer { Value = "Merhaba " });
-                Logger.LogInformation($"Zero Layer Result : {JsonConvert.SerializeObject(response)} Sleep At : {DateTime.UtcNow.ToString()} \n");
-                await Task.Delay(60000, stoppingToken);
+                var timeout = TimeSpan.FromSeconds(30);
+                using var source = new CancellationTokenSource(timeout);
+
+                var response = await _client.GetResponse<OperationResult>(new ZeroLayerScoutConsumer { Value = "Merhaba " } , source.Token);
+                Logger.LogInformation($"Zero Layer Result : {JsonConvert.SerializeObject(response)}");
+                Logger.LogInformation($" Sleep 5 Minutes At : {DateTime.UtcNow.ToString()}");
+                source.Dispose();
+
+                await Task.Delay(60000 * 5, stoppingToken); //SLEEP 5 MINUTES
             }
         }
     }

@@ -12,6 +12,8 @@ using Alibaba_Scout.Modals;
 using Microsoft.EntityFrameworkCore;
 using Arch.EntityFrameworkCore.UnitOfWork;
 using Alibaba_Scout.Modals.Categories;
+using Alibaba_Scout.Contracts;
+using Company.Consumers;
 
 namespace Alibaba_Scout
 {
@@ -44,6 +46,7 @@ namespace Alibaba_Scout
                         x.AddSagaStateMachines(entryAssembly);
                         x.AddSagas(entryAssembly);
                         x.AddActivities(entryAssembly);
+                        x.AddConsumer<ZeroLayerScoutConsumerConsumer>(typeof(ZeroLayerScoutConsumerConsumerDefinition));
 
                         x.UsingRabbitMq((context, cfg) =>
                         {
@@ -54,7 +57,7 @@ namespace Alibaba_Scout
 
                             cfg.ConfigureEndpoints(context);
                         });
-                        x.AddRequestClient<ZeroLayerScoutConsumer>();
+                        x.AddRequestClient<OperationResult>();
                     });
                     services.AddHostedService<Worker>();
 
