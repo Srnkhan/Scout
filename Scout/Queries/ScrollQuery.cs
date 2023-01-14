@@ -8,5 +8,6 @@ namespace Scout.Queries
 {
     public class ScrollQuery : CommonQuery
     {
+        public int ScrollHeight { get; set; } = 0;
     }
 }

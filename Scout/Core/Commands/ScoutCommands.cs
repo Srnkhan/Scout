@@ -67,7 +67,14 @@ namespace Scout.Core.Commands
         {
             try
             {
-                await Page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)");
+                if (query.ScrollHeight <= 0)
+                {
+                    await Page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)"); 
+                }
+                else
+                {
+                    await Page.EvaluateExpressionAsync($"window.scrollBy(0, {query.ScrollHeight})");
+                }
                 return new CommandResult(null, true, "Success", query.Operation);
             }
             catch (Exception ex)
@@ -93,11 +100,15 @@ namespace Scout.Core.Commands
             }
         }
         public async Task<CommandResult> QueryCommandAsync(JsQuery query)
-        {
+        {            
             var queryResult = await Page.EvaluateExpressionAsync(query.Query);
+            if (!string.IsNullOrWhiteSpace(query.WaitForSelector))
+            {
+                await Page.WaitForSelectorAsync(query.WaitForSelector);
+            }
             return queryResult != null ?
                 new CommandResult(queryResult, true, "Success", query.Operation) :
-                new CommandResult(queryResult, false, "Fail", query.Operation);
+                new CommandResult(null, false, "Fail", query.Operation);
         }
     }
 }

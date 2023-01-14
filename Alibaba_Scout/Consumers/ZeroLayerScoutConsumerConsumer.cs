@@ -44,7 +44,7 @@ namespace Company.Consumers
             try
             {
                 Logger.LogInformation($"Zero Layer Started At : {DateTime.UtcNow.ToString()}");
-                await CreatePage();
+                await CreatePageAsync();
 
                 var urlListResponse = await new ScoutCommand(CommandType.JsQuery,
                                                         new ScoutCommands(CurrentPage),
@@ -77,7 +77,7 @@ namespace Company.Consumers
             }
 
         }
-        private async Task CreatePage()
+        private async Task CreatePageAsync()
         {
             this.CurrentPage = await ScoutBuilderDirector
                                 .NewPage

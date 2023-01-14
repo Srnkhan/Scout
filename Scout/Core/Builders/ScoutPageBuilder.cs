@@ -11,11 +11,11 @@ namespace Scout.Core.Builders
         /// <summary>
         /// Show Automated Explorer
         /// </summary>
-        /// <param name="headerless"></param>
+        /// <param name="showHeader"></param>
         /// <returns></returns>
-        public T Header(bool headerless)
+        public T Header(bool showHeader)
         {
-            SCConfiguration.PageConfiguration.HeaderLess = headerless;
+            SCConfiguration.PageConfiguration.HeaderLess = !showHeader;
             return (T)this;
 
         }

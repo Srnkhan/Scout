@@ -9,5 +9,6 @@ namespace Scout.Queries
     public class JsQuery : CommonQuery
     {
         public string Query { get; set; }
+        public string WaitForSelector { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Alibaba_Scout.Modals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlibabaScout.Migrations
 {
     [DbContext(typeof(AlibabaScoutDbContext))]
-    partial class AlibabaScoutDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230113125219_ProductionTable")]
+    partial class ProductionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

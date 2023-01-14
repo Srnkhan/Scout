@@ -14,14 +14,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Alibaba_Scout
+namespace Alibaba_Scout.Workers
 {
-    public class Worker : BackgroundService
+    public class ZeroLayerWorker : BackgroundService
     {
         IRequestClient<ZeroLayerScoutConsumer> _client;
-        private readonly ILogger<Worker> Logger;
+        private readonly ILogger<ZeroLayerWorker> Logger;
 
-        public Worker(IServiceProvider serviceProvider, ILogger<Worker> logger)
+        public ZeroLayerWorker(IServiceProvider serviceProvider, ILogger<ZeroLayerWorker> logger)
         {
             _client = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IRequestClient<ZeroLayerScoutConsumer>>();
             Logger = logger;
@@ -34,7 +34,7 @@ namespace Alibaba_Scout
                 var timeout = TimeSpan.FromSeconds(30);
                 using var source = new CancellationTokenSource(timeout);
 
-                var response = await _client.GetResponse<OperationResult>(new ZeroLayerScoutConsumer { Value = "Merhaba " } , source.Token);
+                var response = await _client.GetResponse<OperationResult>(new ZeroLayerScoutConsumer { Value = "Merhaba " }, source.Token);
                 Logger.LogInformation($"Zero Layer Result : {JsonConvert.SerializeObject(response)}");
                 Logger.LogInformation($" Sleep 5 Minutes At : {DateTime.UtcNow.ToString()}");
                 source.Dispose();

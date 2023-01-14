@@ -14,6 +14,8 @@ using Arch.EntityFrameworkCore.UnitOfWork;
 using Alibaba_Scout.Modals.Categories;
 using Alibaba_Scout.Contracts;
 using Company.Consumers;
+using Alibaba_Scout.Workers;
+using Alibaba_Scout.Modals.Productions;
 
 namespace Alibaba_Scout
 {
@@ -47,10 +49,12 @@ namespace Alibaba_Scout
                         x.AddSagas(entryAssembly);
                         x.AddActivities(entryAssembly);
                         x.AddConsumer<ZeroLayerScoutConsumerConsumer>(typeof(ZeroLayerScoutConsumerConsumerDefinition));
+                        x.AddConsumer<FirstLayerConsumerConsumer>(typeof(FirstLayerConsumerConsumerDefinition));
+                        x.AddConsumer<FirstLayerTraverseConsumerConsumer>(typeof(FirstLayerTraverseConsumerConsumerDefinition));
 
                         x.UsingRabbitMq((context, cfg) =>
                         {
-                            cfg.Host("localhost", "/", h => {
+                            cfg.Host("208.64.33.68", "/", h => {
                                 h.Username("guest");
                                 h.Password("guest");
                             });
@@ -59,14 +63,16 @@ namespace Alibaba_Scout
                         });
                         x.AddRequestClient<OperationResult>();
                     });
-                    services.AddHostedService<Worker>();
+                    //services.AddHostedService<ZeroLayerWorker>();
+                    services.AddHostedService<FirstLayerWorker>();
 
                     services
                        .AddDbContext<AlibabaScoutDbContext>(opt =>
-                       opt.UseSqlServer("Server=localhost,1433;Database=Scout;User Id=sa;Password=Password123;TrustServerCertificate=True"))
+                       opt.UseSqlServer("Data Source=208.64.33.68, 52359;Database=Scout;User Id=srnk;Password=Mrkb6895!;TrustServerCertificate=True"))
                        //.AddDbContext<BloggingContext>(opt => opt.UseInMemoryDatabase("UnitOfWork"))
                        .AddUnitOfWork<AlibabaScoutDbContext>()
-                       .AddCustomRepository<Category, CategoryRepository>();
+                       .AddCustomRepository<Category, CategoryRepository>()
+                       .AddCustomRepository<Production, ProductionRepository>();
                 });
     }
 }
